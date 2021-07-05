@@ -61,7 +61,8 @@ protected:
         std::shared_ptr<DBusConnection> connection,
         const std::string& xmlInterfaceIntrospection,
         const std::string& objectPath,
-        GDBusInterfaceMethodCallFunc methodCallFunc);
+        GDBusInterfaceMethodCallFunc methodCallFunc,
+        GDBusInterfaceGetPropertyFunc getPropertyFunc);
 
     /**
      * Method used solely for logging the call of the object's method

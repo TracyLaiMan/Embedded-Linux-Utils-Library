@@ -41,10 +41,11 @@ DBusObjectBase::DBusObjectBase(
     std::shared_ptr<DBusConnection> connection,
     const std::string& xmlInterfaceIntrospection,
     const std::string& objectPath,
-    GDBusInterfaceMethodCallFunc methodCallFunc) :
+    GDBusInterfaceMethodCallFunc methodCallFunc,
+    GDBusInterfaceGetPropertyFunc getPropertyFunc) :
         m_xmlInterfaceIntrospection{xmlInterfaceIntrospection},
         m_registrationId{0},
-        m_interfaceVtable{methodCallFunc, nullptr, nullptr},
+        m_interfaceVtable{methodCallFunc, nullptr, nullptr}, //m_interfaceVtable{methodCallFunc, getPropertyFunc, nullptr},
         m_connection{connection},
         m_objectPath{objectPath} {
 }
@@ -72,6 +73,18 @@ bool DBusObjectBase::registerWithDBus() {
         ACSDK_ERROR(LX("Failed to register object").d("error", error.getMessage()));
         return false;
     }
+    GDBusInterfaceInfo *interface = g_dbus_node_info_lookup_interface (data,"org.bluez.LEAdvertisement1");
+    if(!interface){
+        ACSDK_DEBUG5(LX("g_dbus_interface_info_lookup_method------------------1"));
+    }
+    else {
+        ACSDK_DEBUG5(LX("g_dbus_interface_info_lookup_method------------------2"));
+    }
+    
+    if(!g_dbus_interface_info_lookup_method(interface,"Release")){
+
+        ACSDK_DEBUG5(LX("g_dbus_interface_info_lookup_method------------------3"));
+    }else ACSDK_DEBUG5(LX("g_dbus_interface_info_lookup_method------------------4"));
 
     GDBusInterfaceInfo* interfaceInfo = data->interfaces[0];
 

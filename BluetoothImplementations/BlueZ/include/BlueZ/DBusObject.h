@@ -64,7 +64,7 @@ protected:
         std::string xmlInterfaceIntrospection,
         std::string objectPath,
         std::unordered_map<std::string, commandHandler_t> methodMap) :
-            DBusObjectBase(connection, xmlInterfaceIntrospection, objectPath, &onMethodCallStatic),
+            DBusObjectBase(connection, xmlInterfaceIntrospection, objectPath, &onMethodCallStatic, &onGetPropertyStatic),
             m_commands{methodMap} {
     }
 
@@ -93,6 +93,7 @@ private:
         GDBusMethodInvocation* invocation,
         gpointer data) {
         auto thisPtr = static_cast<T*>(data);
+        printf("hahhahahahahahah------------------1\n");
         thisPtr->onMethodCall(method_name, parameters, invocation);
     }
 
@@ -107,23 +108,72 @@ private:
      */
     void onMethodCall(const gchar* method_name, GVariant* parameters, GDBusMethodInvocation* invocation);
 
+    static GVariant* onGetPropertyStatic(
+        GDBusConnection* conn,
+        const gchar* sender_name,
+        const gchar* object_path,
+        const gchar* interface_name,
+        const gchar* property_name,
+        GError **errors,
+        gpointer data) {
+        auto thisPtr = static_cast<T*>(data);
+        printf("hahhahahahahahah----------------%s-：-%s\n",interface_name,property_name);
+        thisPtr->onGetProperty(property_name);
+    }
+
+    GVariant* onGetProperty(const gchar* property_name);
+
     // Map between method names and member functions implementing them
     std::unordered_map<std::string, commandHandler_t> m_commands;
+
 };
 
 template <class T>
 void DBusObject<T>::onMethodCall(const gchar* method_name, GVariant* parameters, GDBusMethodInvocation* invocation) {
     onMethodCalledInternal(method_name);
 
+  {
+    // Build Dict of properties.
+    GVariantBuilder *builder;
+    builder = g_variant_builder_new(G_VARIANT_TYPE("a{sv}"));
+
+    //g_variant_builder_init(advBuilder, G_VARIANT_TYPE("a{sv}"));
+    //g_variant_builder_add(&builder, "{sv}", CAN_GO_NEXT.c_str(), g_variant_new("(s)","peripheral"));
+    g_variant_builder_add(builder,"{sv}","Type",g_variant_new_string("peripheral"));
+    g_variant_builder_add(builder,"{sv}","LocalName",g_variant_new_string("TracyA"));
+
+    //GVariant* properties = g_variant_builder_end(builder);
+    g_dbus_method_invocation_return_value(invocation, g_variant_new("(a{sv})",builder));
+  }
+
+    // GVariantBuilder *advBuilder;
+    // advBuilder = g_variant_builder_new(G_VARIANT_TYPE("a{sv}"));
+    // g_variant_builder_add(advBuilder, "({sv})", "Type", g_variant_new_string("peripheral"));
+    // GVariant* adv = g_variant_builder_end(advBuilder);
+    // g_dbus_method_invocation_return_value(invocation, g_variant_new("(a{sv})",adv));
+#if 0
     auto iter = m_commands.find(method_name);
     if (iter != m_commands.end()) {
         commandHandler_t handler = iter->second;
         (static_cast<T*>(this)->*handler)(parameters, invocation);
     } else {
         g_dbus_method_invocation_return_error(
-            invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method: ");
+            invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method: test");
     }
+#endif
 }
+
+template <class T>
+GVariant* DBusObject<T>::onGetProperty(const gchar* property_name) {
+
+    printf("aaaaaaaa-------------------\r\n");
+    // auto iter = m_property_commands.find(property_name);
+    // if (iter != m_property_commands.end()) {
+    //     commandPropertyHandler_t handler = iter->second;
+    //     (static_cast<T*>(this)->*handler)(property_name);
+    // }
+}
+
 
 }  // namespace blueZ
 }  // namespace bluetoothImplementations

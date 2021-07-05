@@ -40,6 +40,8 @@ public:
     /// Name of the BlueZ interface responsible for local bluetooth hardware interactions
     static constexpr auto BLUEZ_ADAPTER_INTERFACE = "org.bluez.Adapter1";
 
+    static constexpr auto BLUEZ_LE_ADVERTISING_INTERFACE = "org.bluez.LEAdvertisement1";
+
     /// Name of the BlueZ interface responsible for media playback control
     static constexpr auto BLUEZ_MEDIA_INTERFACE = "org.bluez.Media1";
 

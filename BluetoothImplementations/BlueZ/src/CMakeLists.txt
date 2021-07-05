@@ -9,6 +9,7 @@ add_library(BluetoothImplementationsBlueZ SHARED
     GVariantMapReader.cpp
     GVariantTupleReader.cpp
     BlueZDeviceManager.cpp
+    BlueZBleAdvertising.cpp
     )
 
 target_include_directories(BluetoothImplementationsBlueZ PUBLIC

@@ -10,6 +10,7 @@
 #include "BlueZUtils.h"
 #include "BlueZ/DBusPropertiesProxy.h"
 #include "BlueZ/DBusConnection.h"
+#include "BlueZ/BlueZBleAdvertising.h"
 #include <gio/gio.h>
 
 namespace alexaClientSDK {
@@ -98,8 +99,17 @@ private:
      */
     void onInterfaceRemoved(const char* objectPath);
 
+        /**
+     * Retrieves the current state from BlueZ service and updates internal state accordingly.
+     */
+    bool getStateFromBlueZ();
+
      /// Thread procedure to setup and handle GLib events
     void mainLoopThread();
+
+    bool initializeBleAdvertising();
+
+    std::shared_ptr<BlueZBleBleAdvertising> m_blueZBleBleAdvertising;
 
     /// DBus object path of the hardware bluetooth adapter used by device manager
     std::string m_adapterPath;
